@@ -1,27 +1,71 @@
-import pandas as pd
+import csv
+import random
 import matplotlib.pyplot as plt
-from sklearn.preprocessing import StandardScaler
-from sklearn.cluster import KMeans
 
-# Load the dataset from a CSV file
-file_path = 'kmeansdataset.csv'  # Replace with the path to your CSV file
-data = pd.read_csv(file_path)
+def load_data(file_path):
+    data = []
+    with open(file_path, 'r') as file:
+        reader = csv.reader(file)
+        next(reader)  # Skip header
+        for row in reader:
+            data.append([float(row[0]), float(row[1])])
+    return data
 
-# Normalize the data
-scaler = StandardScaler()
-scaled_data = scaler.fit_transform(data)
+def initialize_centroids(data, k):
+    return random.sample(data, k)
 
-# Apply K-means clustering
-kmeans = KMeans(n_clusters=3, random_state=42)  # You can adjust the number of clusters
-kmeans.fit(scaled_data)
+def euclidean_distance(point1, point2):
+    return sum((x - y) ** 2 for x, y in zip(point1, point2)) ** 0.5
 
-# Add the cluster labels to the data
-data['Cluster'] = kmeans.labels_
+def assign_clusters(data, centroids):
+    clusters = [[] for _ in centroids]
+    for point in data:
+        distances = [euclidean_distance(point, centroid) for centroid in centroids]
+        closest_centroid_index = distances.index(min(distances))
+        clusters[closest_centroid_index].append(point)
+    return clusters
 
-# Plot the clusters
-plt.figure(figsize=(10, 6))
-plt.scatter(data.iloc[:, 0], data.iloc[:, 1], c=data['Cluster'], cmap='viridis', marker='o')
-plt.title('K-means Clustering')
-plt.xlabel('Feature 1')
-plt.ylabel('Feature 2')
-plt.show()
+def recalculate_centroids(clusters):
+    new_centroids = []
+    for cluster in clusters:
+        new_centroid = [sum(dim)/len(cluster) for dim in zip(*cluster)]
+        new_centroids.append(new_centroid)
+    return new_centroids
+
+def has_converged(old_centroids, new_centroids, threshold=1e-4):
+    total_movement = sum(euclidean_distance(old, new) for old, new in zip(old_centroids, new_centroids))
+    return total_movement < threshold
+
+def k_means(data, k, max_iterations=100):
+    centroids = initialize_centroids(data, k)
+    for _ in range(max_iterations):
+        clusters = assign_clusters(data, centroids)
+        new_centroids = recalculate_centroids(clusters)
+        if has_converged(centroids, new_centroids):
+            break
+        centroids = new_centroids
+    return clusters, centroids
+
+def plot_clusters(clusters, centroids):
+    colors = ['r', 'g', 'b', 'y', 'c', 'm']
+    for i, cluster in enumerate(clusters):
+        cluster_points = list(zip(*cluster))
+        plt.scatter(cluster_points[0], cluster_points[1], c=colors[i], label=f'Cluster {i}')
+    
+    centroid_points = list(zip(*centroids))
+    plt.scatter(centroid_points[0], centroid_points[1], c='k', marker='x', label='Centroids')
+    plt.xlabel('Feature 1')
+    plt.ylabel('Feature 2')
+    plt.legend()
+    plt.title('K-Means Clustering')
+    plt.show()
+
+if __name__ == "__main__":
+    data = load_data('kmeansdataset.csv')
+    k =5
+    clusters, centroids = k_means(data, k)
+    print(f"Final centroids: {centroids}")
+    for i, cluster in enumerate(clusters):
+        print(f"Cluster {i}: {cluster}")
+    
+    plot_clusters(clusters, centroids)
