@@ -13,10 +13,8 @@ def calculate_accuracy(y_true, y_pred):
 
 data = pd.read_csv('output.csv')
 
-# Clean up column names (remove extra spaces)
 data.columns = data.columns.str.strip()
 
-# Convert 'Anaemic' column to binary numeric values (Yes = 1, No = 0)
 data['Anaemic'] = data['Anaemic'].map({'Yes': 1, 'No': 0})
 
 
@@ -34,6 +32,7 @@ y_pred = np.zeros(len(y))
 
 accuracy = calculate_accuracy(y, y_pred)
 print("\nAccuracy:", accuracy)
+print("\n")
 
 
 
@@ -49,17 +48,18 @@ def calculate_accuracy(y_true, y_pred):
 
 data = pd.read_csv('missing.csv')
 
-# Clean up column names (remove extra spaces)
 data.columns = data.columns.str.strip()
 
-# Convert 'Anaemic' column to binary numeric values (Yes = 1, No = 0)
 data['Anaemic'] = data['Anaemic'].map({'Yes': 1, 'No': 0})
 
 
 missing_counts = count_missing_values(data)
 if not missing_counts.empty:
     print("DATASET - 2 \n Missing Values:")
+    
     print(missing_counts)
+    print("\n")
+
 else:
     print("No missing values.")
 
@@ -70,3 +70,4 @@ y_pred = np.zeros(len(y))
 
 accuracy = calculate_accuracy(y, y_pred)
 print("Accuracy:", accuracy)
+print("\n")
