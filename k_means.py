@@ -6,7 +6,7 @@ def load_data(file_path):
     data = []
     with open(file_path, 'r') as file:
         reader = csv.reader(file)
-        next(reader)  # Skip header
+        next(reader)  
         for row in reader:
             data.append([float(row[0]), float(row[1])])
     return data
