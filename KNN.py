@@ -38,7 +38,7 @@ X = data.iloc[:, :-1].values
 # Perform KNN clustering
 clusters, centroids = knn(X, k=2)
 
-# Get user input for a new data point
+# Get user input for a new data poi+nt
 def get_user_input():
     input_features = []
     feature_names = data.columns[:-1]
