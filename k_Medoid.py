@@ -80,7 +80,7 @@ def k_medoids(X, k, max_iter=100):
                         new_labels[p] = np.argmin(distances)
 
                     new_cost = calculate_total_cost(X, new_medoids, new_labels)
-
+                    
                     if new_cost < current_cost:
                         print(f"Found a better medoid swap: {medoids_idx[i]} swapped with {j}")
                         print(f"New total cost: {new_cost}")
